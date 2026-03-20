@@ -1,11 +1,14 @@
 import feedparser
 import sqlite3
+from pathlib import Path
 
 rss_url = "https://www3.nhk.or.jp/rss/news/cat0.xml"
 
 feed = feedparser.parse(rss_url)
 
-conn = sqlite3.connect("news.db")
+db_path = Path(__file__).resolve().parents[1] / "db" / "news.db"
+db_path.parent.mkdir(parents=True, exist_ok=True)
+conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
 for entry in feed.entries:

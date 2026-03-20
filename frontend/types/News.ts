@@ -3,4 +3,6 @@ export type News = {
     title: string;
     link: string;
     published: string;
+    isBookmarked: boolean;
+    isDeleted: boolean;
   };
