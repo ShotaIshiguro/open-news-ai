@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import sqlite3
 from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
+from email.utils import parsedate_to_datetime
 
 app = FastAPI()
 app.add_middleware(
@@ -11,6 +12,15 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+def format_published(published_raw: str) -> str:
+    try:
+        dt = parsedate_to_datetime(published_raw)
+        return dt.strftime("%Y/%m/%d %H:%M")
+    except Exception:
+        # パースできないデータは元の文字列を返す
+        return published_raw
+
 @app.get("/")
 def read_root():
     return {"message": "Open News AI API"}
@@ -43,7 +53,7 @@ def get_news():
             "id": row[0],
             "title": row[1],
             "link": row[2],
-            "published": row[3],
+            "published": format_published(row[3]),
             "isBookmarked": row[4]
         }
         news_list.append(news)
@@ -79,7 +89,7 @@ def get_news():
             "id": row[0],
             "title": row[1],
             "link": row[2],
-            "published": row[3],
+            "published": format_published(row[3]),
             "isBookmarked": row[4]
         }
         news_list.append(news)

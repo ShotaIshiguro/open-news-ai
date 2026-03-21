@@ -27,7 +27,7 @@ export default function NewsList({
             className="mb-4 min-h-[150px] justify-between rounded-md bg-white p-4 shadow-md flex flex-col hover:translate-y-[-8px] transition-all duration-300"
           >
             <span
-              className="text-black text-xl mb-2 hover:font-bold transition-all duration-300"
+              className="text-black text-xl mb-2  hover:text-2xl transition-all duration-500"
               onClick={() => window.open(news.link, "_blank")}
             >
               {news.title}
