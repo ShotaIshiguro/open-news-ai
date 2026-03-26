@@ -20,7 +20,7 @@ export default function NewsList({
   return (
     <div className="flex flex-col items-center">
       <SectionHeader title={sectionTitle} />
-      <div className="py-8 px-8 w-[80%] grid grid-cols-3 gap-4 max-h-[600px] overflow-y-auto ">
+      <div className="news-scroll py-8 px-8 w-[80%] grid grid-cols-3 gap-4 max-h-[calc(100vh-200px)] overflow-y-auto">
         {newsList.map((news) => (
           <div
             key={news.id}

@@ -8,8 +8,8 @@ export default async function Page() {
 
   return (
     <main className="min-h-screen pb-16">
-      <HeroSection />
-      <NewsList newsList={newsList} sectionTitle="ニュース一覧" />
+      <HeroSection pageTitle="TOP" />
+      <NewsList newsList={newsList} sectionTitle="News" />
     </main>
   );
 }

@@ -1,8 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Query
+from pydantic import BaseModel
 import sqlite3
 from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
 from email.utils import parsedate_to_datetime
+
+class CreateTopicRequest(BaseModel):
+    name: str
+
 
 app = FastAPI()
 app.add_middleware(
@@ -124,3 +129,33 @@ def bookmark_news(newsId):
         if conn:
             conn.close()
 
+@app.get("/topics")
+def get_topics():
+    db_path = Path(__file__).resolve().parents[1] / "db" / "news.db"
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT
+        id
+        , name
+    FROM
+        topic
+    WHERE
+        is_deleted = 0
+    ORDER BY
+        id ASC
+    """)
+
+    results = cursor.fetchall()
+    conn.close()
+
+    topics = []
+    for row in results:
+        topic = {
+            "id": row[0],
+            "name": row[1]
+        }
+        topics.append(topic)
+
+    return topics
