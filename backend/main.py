@@ -31,24 +31,28 @@ def read_root():
     return {"message": "Open News AI API"}
 
 @app.get("/news")
-def get_news():
+def get_news(topicId: int | None = Query(default=None)):
     # データベースへの接続を確立する
     db_path = Path(__file__).resolve().parents[1] / "db" / "news.db"
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # newsより最新20件のレコードを取得する
-    cursor.execute("""
-    SELECT 
-        id
-        , title
-        , link
-        , published
-        , is_bookmarked
-    FROM news
-    ORDER BY id desc
-    LIMIT 20
-    """)
+    if topicId is None:
+        cursor.execute("""
+        SELECT id, title, link, published, is_bookmarked, topic_id
+        FROM news
+        ORDER BY id desc
+        LIMIT 20
+        """)
+    else:
+        cursor.execute("""
+        SELECT id, title, link, published, is_bookmarked, topic_id
+        FROM news
+        WHERE topic_id = ?
+        ORDER BY id desc
+        LIMIT 20
+        """, (topicId,))
     results = cursor.fetchall()
     conn.close()
 
@@ -59,7 +63,8 @@ def get_news():
             "title": row[1],
             "link": row[2],
             "published": format_published(row[3]),
-            "isBookmarked": row[4]
+            "isBookmarked": row[4],
+            "topicId": row[5]
         }
         news_list.append(news)
 
@@ -159,3 +164,23 @@ def get_topics():
         topics.append(topic)
 
     return topics
+
+@app.post("/topics")
+def create_topic(payload: CreateTopicRequest):
+    name = payload.name.strip()
+    if len(name) == 0:
+        raise HTTPException(status_code=400, detail="トピック名は必須です。")
+    if len(name) > 30:
+        raise HTTPException(status_code=400, detail="トピック名は30文字以内です。")
+    db_path = Path(__file__).resolve().parents[1] / "db" / "news.db"
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT INTO topic (name) VALUES (?)", (name,))
+        conn.commit()
+        topic_id = cursor.lastrowid
+        return {"id": topic_id, "name": name}
+    except sqlite3.IntegrityError:
+        raise HTTPException(status_code=409, detail="同名トピックが既に存在します。")
+    finally:
+        conn.close()
