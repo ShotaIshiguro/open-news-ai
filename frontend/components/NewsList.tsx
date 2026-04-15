@@ -1,23 +1,70 @@
 "use client";
 import { News } from "@/types/News";
+import { Bookmark } from "lucide-react";
+import { toggleBookmark } from "@/lib/news";
+import { useRouter } from "next/navigation";
 
-export default function NewsList({ newsList }: { newsList: News[] }) {
+export default function NewsList({
+  newsList,
+  sectionTitle,
+}: {
+  newsList: News[];
+  sectionTitle: string;
+}) {
+  const router = useRouter();
+  const handleToggleBookmark = (id: number) => {
+    toggleBookmark(id);
+    router.refresh();
+  };
+
   return (
-    <>
-      <SectionHeader title="ニュース一覧" />
-      <div className="py-4 w-[80%]">
-        {newsList.map((news) => (
-          <div
-            key={news.id}
-            className="mb-4 rounded-md bg-white p-4 shadow-md flex flex-col hover:translate-x-[16px] transition-all duration-300"
-            onClick={() => window.open(news.link, "_blank")}
-          >
-            <span className="text-black text-2xl mb-2">{news.title}</span>
-            <span className="text-gray-500 text-sm">{news.published}</span>
-          </div>
-        ))}
-      </div>
-    </>
+    <div className="flex flex-col items-center bg-mauve-900 py-24">
+      <SectionHeader title={sectionTitle} />
+
+      {newsList.length === 0 ? (
+        <div className="flex flex-col items-center justify-center w-full">
+          <span className="text-white text-2xl font-bold">
+            No news found...
+          </span>
+        </div>
+      ) : (
+        <div className="news-scroll py-8 px-8 w-[80%] grid grid-cols-3 gap-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+          {newsList.map((news) => (
+            <div
+              key={news.id}
+              className="mb-4 min-h-[150px] justify-between rounded-md bg-white p-4 shadow-md flex flex-col hover:translate-y-[-8px] transition-all duration-300"
+            >
+              <span
+                className="text-black text-xl mb-2  hover:text-2xl transition-all duration-500"
+                onClick={() => window.open(news.link, "_blank")}
+              >
+                {news.title}
+              </span>
+              <div className="flex justify-between">
+                <span className="text-gray-500 text-sm">{news.published}</span>
+                <button
+                  type="button"
+                  aria-label={`${news.title}をブックマーク`}
+                  aria-pressed={news.isBookmarked}
+                  onClick={() => handleToggleBookmark(news.id)}
+                  className={`rounded-full p-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 ${
+                    news.isBookmarked
+                      ? "bg-sky-100 text-sky-600"
+                      : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  }`}
+                >
+                  <Bookmark
+                    className={`h-6 w-6 ${
+                      news.isBookmarked ? "fill-current" : ""
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
