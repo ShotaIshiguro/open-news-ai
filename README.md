@@ -3,6 +3,11 @@ RSSニュースを収集してAIで要約するアプリ
 
 随意制作中。。。
 
+## 技術スタック
+- Frontend: Next.js 16, React 19, TypeScript, Tailwind CSS
+- Backend: FastAPI (Python), SQLite
+- Runtime / Tooling: Node.js (npm), uvicorn
+
 ◽️実装予定機能
 - ユーザーが画面からトピックを追加できること
 - RSSソースの追加
