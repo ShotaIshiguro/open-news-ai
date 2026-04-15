@@ -179,6 +179,7 @@ def create_topic(payload: CreateTopicRequest):
         cursor.execute("INSERT INTO topic (name) VALUES (?)", (name,))
         conn.commit()
         topic_id = cursor.lastrowid
+        
         return {"id": topic_id, "name": name}
     except sqlite3.IntegrityError:
         raise HTTPException(status_code=409, detail="同名トピックが既に存在します。")

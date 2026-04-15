@@ -26,10 +26,28 @@ body {
 }
 
 .hero-shell {
+  background: transparent;
+}
+
+/* ページ全体の固定背景レイヤー */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
   background-image: url("/images/hero.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+/* 固定背景の上に薄い暗幕を敷く */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(0, 0, 0, 0.45);
 }
 
 .hero-panel {
